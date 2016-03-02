@@ -11,7 +11,7 @@ if(args[0] === 'init-git' && args.length === 1) {
 	var defaultSettings = {
 		"config": {
 			"commitizen": {
-				"path": "./node_modules/naoned-conventions-npm/node_modules/naoned-cz-conventional-changelog"
+				"path": "./node_modules/naoned-cz-conventional-changelog"
 			},
 			"ghooks": {
 				"commit-msg": "validate-commit-msg"
@@ -30,7 +30,7 @@ if(args[0] === 'init-git' && args.length === 1) {
 			jsonfile.writeFile(file, merge.recursive(true, obj, defaultSettings), {spaces: 2}, function (err) {
 				if(err === null) {
 					sh.cd(process.cwd());
-					sh.exec('npm i --save ghooks validate-commit-msg');
+					sh.exec('npm i --save ghooks validate-commit-msg naoned-cz-conventional-changelog');
 				} else {
 					sh.echo(err);
 				}
