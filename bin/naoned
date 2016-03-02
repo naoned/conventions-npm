@@ -3,6 +3,7 @@
 
 var jsonfile = require('jsonfile');
 var merge = require('merge');
+var sh = require('shelljs');
 var args = process.argv.slice(2, process.argv.length);
 
 if(args[0] === 'init-git' && args.length === 1) {
@@ -23,8 +24,17 @@ if(args[0] === 'init-git' && args.length === 1) {
 		}
 	};
 	jsonfile.readFile(file, function(err, obj) {
-		jsonfile.writeFile(file, merge.recursive(true, obj, defaultSettings), {spaces: 2}, function (err) {
-			console.error(err)
-		});
+		if(err) {
+			sh.echo('No package.json? run npm init');
+		} else {
+			jsonfile.writeFile(file, merge.recursive(true, obj, defaultSettings), {spaces: 2}, function (err) {
+				if(err === null) {
+					sh.cd(process.cwd());
+					sh.exec('npm i --save ghooks validate-commit-msg');
+				} else {
+					sh.echo(err);
+				}
+			});
+		}
 	});
 }
