@@ -1,11 +1,30 @@
 #!/usr/bin/env node
+'use strict';
 
+var jsonfile = require('jsonfile');
+var merge = require('merge');
+var args = process.argv.slice(2, process.argv.length);
 
-// Get cli args
-let rawGitArgs = process.argv.slice(2, process.argv.length);
-
-// Parse the args
-let parsedArgs = parse(rawGitArgs);
-let command = parsedArgs._[0];
-
-console.log(command);
+if(args[0] === 'init-git' && args.length === 1) {
+	var file = process.cwd() + '/package.json';
+	var defaultSettings = {
+		"config": {
+			"commitizen": {
+				"path": "./node_modules/naoned-conventions-npm/node_modules/naoned-cz-conventional-changelog"
+			},
+			"ghooks": {
+				"commit-msg": "validate-commit-msg"
+			},
+			"validate-commit-msg": {
+				"types": ["feat", "fix", "docs", "style", "refact", "perf", "test", "misc", "revert"],
+				"warnOnFail": false,
+				"maxSubjectLength": 100
+			}
+		}
+	};
+	jsonfile.readFile(file, function(err, obj) {
+		jsonfile.writeFile(file, merge.recursive(true, obj, defaultSettings), {spaces: 2}, function (err) {
+			console.error(err)
+		});
+	});
+}
