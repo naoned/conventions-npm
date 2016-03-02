@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+
+
+// Get cli args
+let rawGitArgs = process.argv.slice(2, process.argv.length);
+
+// Parse the args
+let parsedArgs = parse(rawGitArgs);
+let command = parsedArgs._[0];
+
+console.log(command);
