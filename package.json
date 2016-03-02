@@ -14,12 +14,9 @@
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
-    "ghooks": "^1.0.3",
     "jsonfile": "^2.2.3",
     "merge": "^1.2.0",
-    "naoned-cz-conventional-changelog": "^0.1.0",
-    "shelljs": "^0.6.0",
-    "validate-commit-msg": "^2.1.0"
+    "shelljs": "^0.6.0"
   },
   "bin": {
     "naoned": "./bin/naoned"
