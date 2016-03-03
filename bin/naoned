@@ -4,37 +4,80 @@
 var jsonfile = require('jsonfile');
 var merge = require('merge');
 var sh = require('shelljs');
+var colors = require('colors');
+var messages = require('../messages');
 var args = process.argv.slice(2, process.argv.length);
 
-if(args[0] === 'init-git' && args.length === 1) {
-	var file = process.cwd() + '/package.json';
-	var defaultSettings = {
-		"config": {
-			"commitizen": {
-				"path": "./node_modules/naoned-cz-conventional-changelog"
-			},
-			"ghooks": {
-				"commit-msg": "validate-commit-msg"
-			},
-			"validate-commit-msg": {
-				"types": ["feat", "fix", "docs", "style", "refact", "perf", "test", "misc", "revert"],
-				"warnOnFail": false,
-				"maxSubjectLength": 100
-			}
-		}
-	};
-	jsonfile.readFile(file, function(err, obj) {
-		if(err) {
-			sh.echo('No package.json? run npm init');
-		} else {
-			jsonfile.writeFile(file, merge.recursive(true, obj, defaultSettings), {spaces: 2}, function (err) {
-				if(err === null) {
-					sh.cd(process.cwd());
-					sh.exec('npm i --save ghooks validate-commit-msg naoned-cz-conventional-changelog');
+if(args[0] === 'init') {
+
+	/**
+	 * Git messages checking & commitizen
+	 */
+	var packageJsonPath = process.cwd() + '/package.json';
+	var defaultConfig = __dirname + '/../config/git-convention.json';
+
+	jsonfile.readFile(defaultConfig, function(e, defaultSettings)  {
+		if(!e) {
+			jsonfile.readFile(packageJsonPath, function(err, packageJson) {
+				if(typeof packageJson === 'undefined') {
+					sh.echo('No package.json? run npm init');
 				} else {
-					sh.echo(err);
+					jsonfile.writeFile(packageJsonPath, merge.recursive(true, packageJson, defaultSettings), {spaces: 2}, function (err) {
+						if(err !== null) {
+							sh.echo(err);
+						}
+					});
 				}
 			});
 		}
 	});
+
+	/**
+	 * ESLint
+	 */
+	var eslintConfigPath = process.cwd() + '/.eslintrc';
+	var baseConfigPath = __dirname + '/../config/base.eslintrc';
+	var legacyConfigPath = __dirname + '/../config/legacy.eslintrc';
+
+	jsonfile.readFile(eslintConfigPath, function(e, eslintConfig)  {
+		if(typeof eslintConfig === 'undefined') {
+			sh.cp(baseConfigPath, eslintConfigPath);
+		}
+		var config = (args.indexOf('--es5') > -1) ? legacyConfigPath : baseConfigPath;
+		jsonfile.readFile(eslintConfigPath, function(err, defaultEsLintSettings)  {
+			if(err === null) {
+				jsonfile.writeFile(eslintConfigPath, merge.recursive(true, eslintConfig, defaultEsLintSettings), {spaces: 2}, function (error) {
+					if(err !== null) {
+						sh.echo(err);
+					}
+				});
+			} else {
+				sh.echo(err);
+			}
+		});
+	});
+
+	/**
+	 * Install dependencies
+	 */
+	sh.cd(process.cwd());
+	sh.exec('npm install --save-dev ghooks validate-commit-msg naoned-cz-conventional-changelog eslint-config-naoned eslint');
+}
+
+if(args[0] === 'pre-commit') {
+	sh.cd(process.cwd());
+	if(sh.exec(__dirname + '/pre-commit.sh').code !== 0) {
+		sh.exit(1);
+	}
+}
+
+if(args[0] === 'commit-msg') {
+	if(sh.exec('node ' + require.resolve('validate-commit-msg'), {silent: true}).code !== 0) {
+		console.log('Your commit message does not respect the format "<type>(<scope>): <subject>"'.inverse);
+		console.log(colors.red(messages.fail))
+		console.log('Consider using "git cz" to write your commit message'.inverse);
+		sh.exit(1);
+	} else {
+		console.log(colors.green(messages.success))
+	}
 }

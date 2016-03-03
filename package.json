@@ -14,6 +14,7 @@
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
+    "colors": "^1.1.2",
     "jsonfile": "^2.2.3",
     "merge": "^1.2.0",
     "shelljs": "^0.6.0"
