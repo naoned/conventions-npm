@@ -43,8 +43,8 @@ if(args[0] === 'init') {
 		if(typeof eslintConfig === 'undefined') {
 			sh.cp(baseConfigPath, eslintConfigPath);
 		}
-		var config = (args.indexOf('--es5') > -1) ? legacyConfigPath : baseConfigPath;
-		jsonfile.readFile(eslintConfigPath, function(err, defaultEsLintSettings)  {
+		var defaultConfigPath = (args.indexOf('--es5') > -1) ? legacyConfigPath : baseConfigPath;
+		jsonfile.readFile(defaultConfigPath, function(err, defaultEsLintSettings)  {
 			if(err === null) {
 				jsonfile.writeFile(eslintConfigPath, merge.recursive(true, eslintConfig, defaultEsLintSettings), {spaces: 2}, function (error) {
 					if(err !== null) {
