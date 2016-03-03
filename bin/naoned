@@ -61,7 +61,7 @@ if(args[0] === 'init') {
 	 * Install dependencies
 	 */
 	sh.cd(process.cwd());
-	sh.exec('npm install --save-dev ghooks validate-commit-msg naoned-cz-conventional-changelog eslint-config-naoned eslint');
+	sh.exec('npm install --save-dev ghooks naoned-cz-conventional-changelog eslint-config-naoned eslint');
 }
 
 if(args[0] === 'pre-commit') {
