@@ -5,6 +5,7 @@ var jsonfile = require('jsonfile');
 var merge = require('merge');
 var sh = require('shelljs');
 var colors = require('colors');
+colors.enabled = true;
 var messages = require('../messages');
 var args = process.argv.slice(2, process.argv.length);
 
